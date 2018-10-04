@@ -1,30 +1,19 @@
 ---
-apiVersion: batch/v2alpha1
-kind: CronJob
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: etcd-empty-dir-cleanup
   namespace: kube-system
 spec:
-  schedule: "0 2 * * *"
-  concurrencyPolicy: "Forbid"
-  jobTemplate:
+  template:
     spec:
-      template:
-        metadata:
-          name: etcd-empty-dir-cleanup
-        spec:
-          hostNetwork: true
-          nodeSelector:
-            kubernetes.io/role: master
-          tolerations:
-          - effect: NoSchedule
-            key: node-role.kubernetes.io/master
-          restartPolicy: OnFailure
-          containers:
-          - name: k8s-cleanup
-            image: onfido/k8s-cleanup
-            command: ["/bin/bash", "/bin/etcd-empty-dir-cleanup.sh"]
-            resources:
-              requests:
-                cpu: 100m
-                memory: 50Mi
+      hostNetwork: true
+      restartPolicy: OnFailure
+      containers:
+      - name: k8s-cleanup
+        image: onfido/k8s-cleanup
+        command: ["/bin/bash", "/bin/etcd-empty-dir-cleanup.sh"]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
